@@ -1,0 +1,176 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "UserProfile",
+      "description": "User account profile and sync metadata",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "photoURL": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "createdAt"]
+    },
+    "voiceProfile": {
+      "title": "VoiceProfile",
+      "description": "Calibrated user voice profile with acoustic traits and persona tuning",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "genderEstimate": {
+          "type": "string",
+          "enum": ["male", "female", "neutral"]
+        },
+        "fundamentalPitchHz": {
+          "type": "number"
+        },
+        "timbre": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "speakingRateWpm": {
+          "type": "number"
+        },
+        "suggestedPrebuiltVoice": {
+          "type": "string",
+          "enum": ["Puck", "Charon", "Kore", "Fenrir", "Zephyr"]
+        },
+        "pitchFineTuneSemitones": {
+          "type": "number"
+        },
+        "formantShift": {
+          "type": "number"
+        },
+        "resonanceFactor": {
+          "type": "number"
+        },
+        "clarityScore": {
+          "type": "number"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "stylePrompt": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "number"
+        },
+        "updatedAt": {
+          "type": "number"
+        }
+      },
+      "required": ["id", "userId", "name", "suggestedPrebuiltVoice", "createdAt"]
+    },
+    "project": {
+      "title": "Project",
+      "description": "Video dubbing, lip-sync, and dialogue alignment project",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "videoUrl": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "videoPoster": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "videoType": {
+          "type": "string",
+          "enum": ["custom", "sample_interview", "sample_podcast"]
+        },
+        "videoDuration": {
+          "type": "number"
+        },
+        "userVoiceProfileId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "transcript": {
+          "type": "string",
+          "maxLength": 50000
+        },
+        "segments": {
+          "type": "array"
+        },
+        "visemeFrames": {
+          "type": "array"
+        },
+        "lipSyncConfig": {
+          "type": "object"
+        },
+        "audioDspConfig": {
+          "type": "object"
+        },
+        "customVoiceAudioUrl": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "lastModified": {
+          "type": "number"
+        }
+      },
+      "required": ["id", "userId", "title", "videoUrl", "videoDuration", "lastModified"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "Private user profile document"
+    },
+    "/users/{userId}/voiceProfiles/{profileId}": {
+      "schema": "voiceProfile",
+      "description": "User voice profiles for voice swapping"
+    },
+    "/users/{userId}/projects/{projectId}": {
+      "schema": "project",
+      "description": "User video and lip-sync projects"
+    }
+  }
+}

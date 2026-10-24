@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // User Profile Document
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // PII protection, no listing user accounts
+      allow create: if isOwner(userId)
+        && incoming().userId == userId
+        && incoming().createdAt is string;
+      allow update: if isOwner(userId)
+        && incoming().userId == userId;
+      allow delete: if isOwner(userId);
+
+      // User Voice Profiles Collection
+      match /voiceProfiles/{profileId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && isValidId(profileId)
+          && incoming().userId == userId
+          && incoming().name is string
+          && incoming().name.size() <= 100
+          && incoming().suggestedPrebuiltVoice in ['Puck', 'Charon', 'Kore', 'Fenrir', 'Zephyr'];
+        allow update: if isOwner(userId)
+          && isValidId(profileId)
+          && incoming().userId == userId
+          && incoming().name is string
+          && incoming().name.size() <= 100
+          && incoming().suggestedPrebuiltVoice in ['Puck', 'Charon', 'Kore', 'Fenrir', 'Zephyr'];
+        allow delete: if isOwner(userId) && isValidId(profileId);
+      }
+
+      // User Video & Lip Sync Projects Collection
+      match /projects/{projectId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && isValidId(projectId)
+          && incoming().userId == userId
+          && incoming().title is string
+          && incoming().title.size() <= 200
+          && incoming().videoUrl is string
+          && incoming().videoDuration is number;
+        allow update: if isOwner(userId)
+          && isValidId(projectId)
+          && incoming().userId == userId
+          && incoming().title is string
+          && incoming().title.size() <= 200;
+        allow delete: if isOwner(userId) && isValidId(projectId);
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "SyncVoice Studio - AI Video Voice Swap & Lip Sync",
+  "description": "Unlimited personal voice swap, studio voiceover recording, real-time AI audio processing, and lip-sync video generator without watermarks or credit limits.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
